@@ -1,7 +1,6 @@
 package ueh.marlon.personapidio.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +44,19 @@ public class PersonService {
 
 	public PersonDTO findById(Long id) throws PersonNotFoundException {
 		
-		Optional<Person> optFindById = personRepository.findById(id);
+		Person foundPerson = findIfExists(id);
 		
-		return optFindById.map(personMapper::toDTO).orElseThrow(() -> new PersonNotFoundException(id));
+		return personMapper.toDTO(foundPerson);
+	}
+
+	private Person findIfExists(Long id) throws PersonNotFoundException {
+		return personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
 	}
 
 	public MessageResponseDTO update(Long id, PersonDTO personDTO) throws PersonNotFoundException {
-		PersonDTO foundPerson = this.findById(id);
+		this.findIfExists(id);
 		
-		Person personToSave = personMapper.toModel(foundPerson);
+		Person personToSave = personMapper.toModel(personDTO);
 		
 		Person saved = personRepository.save(personToSave);
 		
@@ -61,8 +64,8 @@ public class PersonService {
 	}
 
 	public void delete(Long id) throws PersonNotFoundException {
-		PersonDTO foundPerson = this.findById(id);
+		Person foundPerson = this.findIfExists(id);
 		
-		personRepository.delete(personMapper.toModel(foundPerson));
+		personRepository.delete(foundPerson);
 	}
 }
