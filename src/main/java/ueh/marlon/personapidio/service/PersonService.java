@@ -59,4 +59,10 @@ public class PersonService {
 		
 		return createMessageResponse(saved);
 	}
+
+	public void delete(Long id) throws PersonNotFoundException {
+		PersonDTO foundPerson = this.findById(id);
+		
+		personRepository.delete(personMapper.toModel(foundPerson));
+	}
 }
