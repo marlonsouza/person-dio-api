@@ -1,5 +1,8 @@
 package ueh.marlon.personapidio.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +20,10 @@ public class PersonService {
 	private PersonRepository personRepository;
 
 	private PersonMapper personMapper;
+	
 	public MessageResponseDTO save(PersonDTO personDTO) {
-		Person model = personMapper.toModel(personDTO);
-		Person saved = personRepository.save(model);
+		Person personToSave = personMapper.toModel(personDTO);
+		Person saved = personRepository.save(personToSave);
 		
 		return createMessageResponse(saved);
 	}
@@ -28,6 +32,13 @@ public class PersonService {
 		return MessageResponseDTO.builder()
 				.message("Person successfully created with ID " + saved.getId())
 				.build();
+	}
+
+	public List<PersonDTO> listAll() {
+		List<Person> allPeople = personRepository.findAll();
+		return allPeople.stream()
+					.map(personMapper::toDTO)
+					.collect(Collectors.toList());
 	}
 	
 }
